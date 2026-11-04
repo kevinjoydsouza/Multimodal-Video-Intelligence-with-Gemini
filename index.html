@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Building Multimodal Video Intelligence with Gemini API | GDG Workshop</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-card: #21262d;
+            --border-color: #30363d;
+            --text-primary: #f0f6fc;
+            --text-secondary: #8b949e;
+            --accent-green: #238636;
+            --accent-blue: #58a6ff;
+            --accent-neon: #00FF7F;
+            --code-bg: #11141a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+        }
+
+        /* Sidebar Navigation */
+        aside {
+            width: 280px;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            padding: 30px 20px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        aside h2 {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        aside ul {
+            list-style: none;
+        }
+
+        aside li {
+            margin-bottom: 12px;
+        }
+
+        aside a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s ease;
+            display: block;
+        }
+
+        aside a:hover, aside a.active {
+            color: var(--accent-neon);
+        }
+
+        /* Main Content */
+        main {
+            flex-grow: 1;
+            max-width: 980px;
+            padding: 50px 60px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 45px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 25px;
+        }
+
+        .badge {
+            display: inline-block;
+            background-color: rgba(0, 255, 127, 0.15);
+            color: var(--accent-neon);
+            border: 1px solid var(--accent-neon);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 34px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #fff;
+        }
+
+        p.lead {
+            font-size: 17px;
+            color: var(--text-secondary);
+        }
+
+        h2 {
+            font-size: 22px;
+            margin: 40px 0 16px;
+            color: #fff;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        h3 {
+            font-size: 18px;
+            margin: 24px 0 10px;
+            color: var(--accent-blue);
+        }
+
+        p, ul, ol {
+            margin-bottom: 16px;
+            color: #c9d1d9;
+        }
+
+        ul, ol {
+            padding-left: 24px;
+        }
+
+        li {
+            margin-bottom: 6px;
+        }
+
+        /* Callout Boxes */
+        .callout {
+            background-color: var(--bg-card);
+            border-left: 4px solid var(--accent-blue);
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        .callout.success {
+            border-left-color: var(--accent-neon);
+        }
+
+        .callout.warning {
+            border-left-color: #f2cc60;
+        }
+
+        /* Code Blocks */
+        .code-container {
+            position: relative;
+            background-color: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin: 18px 0;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--bg-secondary);
+            padding: 8px 14px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-family: 'Fira Code', monospace;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        pre {
+            padding: 16px;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #e6edf3;
+        }
+
+        .copy-btn {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background-color: var(--accent-blue);
+            color: #fff;
+            border-color: var(--accent-blue);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+        }
+
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 12px 14px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: var(--bg-secondary);
+            color: #fff;
+        }
+
+        td {
+            background-color: var(--bg-card);
+        }
+
+        @media (max-width: 900px) {
+            body {
+                flex-direction: column;
+            }
+            aside {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            main {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sticky Navigation Sidebar -->
+    <aside>
+        <h2>Workshop Guide</h2>
+        <ul>
+            <li><a href="#overview">1. Architectural Concepts</a></li>
+            <li><a href="#quickstart">2. Quickstart & Minimal Grounding</a></li>
+            <li><a href="#backend">3. Backend (video_analytics.py)</a></li>
+            <li><a href="#frontend">4. Front-End (app.py)</a></li>
+            <li><a href="#local-run">5. Local Run (Mac / Windows)</a></li>
+            <li><a href="#colab-run">6. Google Colab Instructions</a></li>
+            <li><a href="#demo-script">7. 5-Minute Talk Script</a></li>
+        </ul>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main>
+        <header>
+            <span class="badge">Google Developer Groups (GDG) Workshop</span>
+            <h1>Multimodal Video Intelligence with Gemini</h1>
+            <p class="lead">Build a spatial object grounding engine, semantic action search, and synchronized interactive video player with token-optimized JSON schemas.</p>
+        </header>
+
+        <!-- Section 1: Overview -->
+        <section id="overview">
+            <h2>1. Architectural Concepts</h2>
+            <p>Traditional computer vision approaches require multi-stage pipelines: running YOLO for bounding boxes, OpenCV Haar/MTCNN for face tracking, separate action classifiers, and speech-to-text models. With multimodal Large Language Models like <strong>Gemini 2.5 Flash</strong>, video is ingested natively inside a unified spatial-temporal context window.</p>
+
+            <div class="callout success">
+                <strong>Sampling & Token Optimization:</strong><br>
+                Videos uploaded through the Google GenAI Files API are automatically sampled visually at <strong>1 frame per second (1 FPS)</strong> (~258–263 tokens/second) with audio consumed at ~32 tokens/second. A 1-minute video costs only ~17,700 tokens, easily fitting inside Gemini's 1M+ context window.
+            </div>
+
+            <h3>Spatial Entity Grounding Format</h3>
+            <p>Gemini returns normalized 2D coordinates scaled between <code>0</code> and <code>1000</code>:</p>
+            <p><code>[ymin, xmin, ymax, xmax]</code> where top-left is <code>(0,0)</code> and bottom-right is <code>(1000, 1000)</code>.</p>
+            <p>To rescale coordinates to pixel boundaries on any video resolution:</p>
+            <ul>
+                <li><code>pixel_x = (xmin / 1000) * image_width</code></li>
+                <li><code>pixel_y = (ymin / 1000) * image_height</code></li>
+            </ul>
+        </section>
+
+        <!-- Section 2: Quickstart -->
+        <section id="quickstart">
+            <h2>2. Quickstart & Minimal Spatial Grounding</h2>
+            <p>Before running full pipelines, verify spatial coordinate prediction on a single test video using this 30-line script:</p>
+
+            <div class="code-container">
+                <div class="code-header">
+                    <span>demo_grounding.py</span>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy Code</button>
+                </div>
+                <pre><code>import os
+from dotenv import load_dotenv
+from google import genai
+from google.genai import types
+from pydantic import BaseModel, Field
+from typing import List
+
+load_dotenv()
+client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+
+class Box2D(BaseModel):
+    ymin: int = Field(description="Top coordinate [0-1000]")
+    xmin: int = Field(description="Left coordinate [0-1000]")
+    ymax: int = Field(description="Bottom coordinate [0-1000]")
+    xmax: int = Field(description="Right coordinate [0-1000]")
+
+class DetectedEntity(BaseModel):
+    label: str
+    action: str
+    box: Box2D
+
+class FrameAnalysis(BaseModel):
+    scene_summary: str
+    entities: List[DetectedEntity]
+
+# Ingest and ground entities
+video_file = client.files.upload(file="media/sample.mp4")
+response = client.models.generate_content(
+    model="gemini-2.5-flash",
+    contents=[video_file, "Detect persons, actions, and normalized bounding boxes."],
+    config=types.GenerateContentConfig(
+        response_mime_type="application/json",
+        response_schema=FrameAnalysis
+    )
+)
+print(response.text)</code></pre>
+            </div>
+        </section>
+
+        <!-- Section 3: Backend -->
+        <section id="backend">
+            <h2>3. Backend Pipeline (video_analytics.py)</h2>
+            <p>This script processes any target video, enforces persistent entity tracking across frames (<code>person_1</code>, <code>face_1</code>), extracts attire color/style, crops face thumbnails with OpenCV, and generates an indexed JSON file alongside your video.</p>
+
+            <div class="code-container">
+                <div class="code-header">
+                    <span>video_analytics.py</span>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy Code</button>
+                </div>
+                <pre><code>import os
+import sys
+import time
+import json
+import cv2
+from typing import List, Optional
+from pydantic import BaseModel, Field
+from dotenv import load_dotenv
+from google import genai
+from google.genai import types
+
+load_dotenv()
+
+class BoundingBox(BaseModel):
+    ymin: int = Field(..., description="Top coordinate normalized 0 to 1000")
+    xmin: int = Field(..., description="Left coordinate normalized 0 to 1000")
+    ymax: int = Field(..., description="Bottom coordinate normalized 0 to 1000")
+    xmax: int = Field(..., description="Right coordinate normalized 0 to 1000")
+
+class DetectedEntity(BaseModel):
+    entity_id: str = Field(..., description="Persistent identifier across frames (e.g., person_1, face_1)")
+    label: str = Field(..., description="Class name")
+    name_or_identity: Optional[str] = Field(None, description="Recognized public figure or role")
+    clothing_description: Optional[str] = Field(None, description="Detailed attire, color, and garments")
+    visual_attributes: Optional[str] = Field(None, description="Distinctive traits (beard, sunglasses, hair)")
+    action: Optional[str] = Field(None, description="Action or posture")
+    box_2d: Optional[BoundingBox] = Field(None, description="Bounding box [0-1000]")
+
+class FrameAnalysis(BaseModel):
+    timestamp_seconds: float = Field(..., description="Timestamp in seconds")
+    timestamp_str: str = Field(..., description="MM:SS")
+    environment_or_place: Optional[str] = Field(None, description="Location or landmark")
+    scene_summary: str = Field(..., description="Detailed description of visual contents and actions")
+    entities: List[DetectedEntity] = Field(default_factory=list)
+
+class VideoAnalyticsReport(BaseModel):
+    video_title: str
+    total_duration_estimate: str
+    prominent_locations: List[str] = Field(default_factory=list)
+    named_entities: List[str] = Field(default_factory=list)
+    frames: List[FrameAnalysis]
+
+def run_video_analytics(video_path: str, output_json: str = None):
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        raise ValueError("GEMINI_API_KEY not found in environment!")
+
+    if not os.path.exists(video_path):
+        raise FileNotFoundError(f"Video file does not exist: {video_path}")
+
+    if output_json is None:
+        base_name, _ = os.path.splitext(video_path)
+        output_json = f"{base_name}.json"
+
+    client = genai.Client(api_key=api_key)
+
+    print(f"[*] Uploading video file '{video_path}'...")
+    video_file = client.files.upload(file=video_path)
+
+    while video_file.state.name == "PROCESSING":
+        time.sleep(4)
+        video_file = client.files.get(name=video_file.name)
+
+    if video_file.state.name == "FAILED":
+        raise RuntimeError(f"Processing failed: {video_file.error.message}")
+
+    print("[*] Video ingested. Running structured multimodal analysis...")
+
+    prompt = """
+    You are an expert video understanding engine. Analyze this video frame-by-frame at 1-second intervals.
+    1. Identify recognizable celebrities and public figures in 'name_or_identity'.
+    2. Note clothing attire, colors, and clothing items in 'clothing_description' (e.g., 'yellow jersey', 'black shirt').
+    3. Keep 'entity_id' consistent across frames (e.g., person_1).
+    4. Provide normalized bounding boxes in [0, 1000] coordinates for body and face.
+    5. Summarize actions and scene settings per frame.
+    """
+
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=[video_file, prompt],
+        config=types.GenerateContentConfig(
+            response_mime_type="application/json",
+            response_schema=VideoAnalyticsReport,
+            temperature=0.1,
+        ),
+    )
+
+    analytics_data = json.loads(response.text)
+
+    # OpenCV face thumbnail extraction
+    os.makedirs("extracted_faces", exist_ok=True)
+    cap = cv2.VideoCapture(video_path)
+
+    if cap.isOpened():
+        width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+        height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+
+        for frame_idx, frame_item in enumerate(analytics_data.get("frames", [])):
+            t_sec = frame_item.get("timestamp_seconds", 0.0)
+            cap.set(cv2.CAP_PROP_POS_MSEC, t_sec * 1000.0)
+            ret, frame_bgr = cap.read()
+            if not ret or frame_bgr is None:
+                continue
+
+            for ent_idx, ent in enumerate(frame_item.get("entities", [])):
+                lbl = ent.get("label", "").lower()
+                if ("face" in lbl or "person" in lbl) and ent.get("box_2d"):
+                    box = ent["box_2d"]
+                    ymin = max(0, int((box["ymin"] / 1000.0) * height))
+                    xmin = max(0, int((box["xmin"] / 1000.0) * width))
+                    ymax = min(int(height), int((box["ymax"] / 1000.0) * height))
+                    xmax = min(int(width), int((box["xmax"] / 1000.0) * width))
+
+                    if ymax > ymin and xmax > xmin:
+                        cropped = frame_bgr[ymin:ymax, xmin:xmax]
+                        thumb_path = f"extracted_faces/crop_{frame_idx}_{ent_idx}_{ent.get('entity_id', 'ent')}.jpg"
+                        cv2.imwrite(thumb_path, cropped)
+                        ent["thumbnail_path"] = thumb_path
+        cap.release()
+
+    with open(output_json, "w", encoding="utf-8") as f:
+        json.dump(analytics_data, f, indent=2)
+
+    print(f"[✓] Analysis complete! Saved to: {output_json}")
+
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        run_video_analytics(sys.argv[1])</code></pre>
+            </div>
+        </section>
+
+        <!-- Section 4: Front-End -->
+        <section id="frontend">
+            <h2>4. Front-End Interface (app.py)</h2>
+            <p>The front-end integrates a compact 3-column video gallery, multi-word semantic fuzzy search, and an HTML5 player with a YouTube-style scrubber showing <strong>in-timeline glowing green match segments</strong> and live-updating canvas overlays.</p>
+
+            <div class="code-container">
+                <div class="code-header">
+                    <span>app.py</span>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy Code</button>
+                </div>
+                <pre><code>import streamlit as st
+import json
+import os
+import re
+import cv2
+import base64
+import streamlit.components.v1 as components
+from PIL import Image
+
+st.set_page_config(page_title="Multimodal Video Intelligence", page_icon="🎬", layout="wide")
+st.title("🎬 Multimodal Video Intelligence Studio")
+
+with st.sidebar:
+    st.header("📂 Media Directory")
+    default_dir = os.path.join(os.getcwd(), "media") if os.path.exists(os.path.join(os.getcwd(), "media")) else os.getcwd()
+    media_folder = st.text_input("Folder Path", value=default_dir)
+
+    st.header("🎨 Visual Overlays")
+    show_boxes = st.toggle("Enable Bounding Boxes", value=True)
+    show_labels = st.toggle("Show Entity Labels", value=True)
+    show_attire = st.toggle("Show Clothing / Attire", value=True)
+    box_color = st.color_picker("Box & Label Color", "#00FF7F")
+
+STOPWORDS = {"with", "in", "a", "an", "the", "and", "or", "on", "at", "is", "wearing", "to", "of", "by", "for"}
+SYNONYM_GROUPS = [
+    {"tshirt", "t shirt", "shirt", "jersey", "uniform", "clothing", "dress", "outfit"},
+    {"speaking", "talking", "speech", "saying", "mic"},
+    {"driving", "car", "vehicle", "ferrari", "auto"},
+    {"walking", "moving", "running"},
+]
+
+def get_synonyms(word: str) -> set:
+    results = {word}
+    for group in SYNONYM_GROUPS:
+        if word in group:
+            results.update(group)
+    return results
+
+def normalize_text(text: str) -> str:
+    cleaned = text.lower().replace("-", " ")
+    return re.sub(r"[^\w\s]", " ", cleaned)
+
+@st.cache_data(show_spinner=False)
+def load_all_video_catalogs(folder_path: str):
+    catalog = []
+    if not os.path.isdir(folder_path):
+        return catalog
+    for file_name in sorted(os.listdir(folder_path)):
+        if file_name.lower().endswith((".mp4", ".mov", ".webm")):
+            base_name, _ = os.path.splitext(file_name)
+            json_path = os.path.join(folder_path, f"{base_name}.json")
+            video_path = os.path.join(folder_path, file_name)
+            if os.path.exists(json_path):
+                try:
+                    with open(json_path, "r", encoding="utf-8") as jf:
+                        catalog.append({"video_name": file_name, "video_path": video_path, "data": json.load(jf)})
+                except Exception:
+                    pass
+    return catalog
+
+def extract_video_frame(video_path: str, timestamp_sec: float, max_width: int = 450):
+    if not os.path.exists(video_path):
+        return None
+    cap = cv2.VideoCapture(video_path)
+    cap.set(cv2.CAP_PROP_POS_MSEC, max(0.0, timestamp_sec * 1000.0))
+    ret, frame_bgr = cap.read()
+    cap.release()
+    if ret and frame_bgr is not None:
+        h, w = frame_bgr.shape[:2]
+        if w > max_width:
+            frame_bgr = cv2.resize(frame_bgr, (max_width, int(h * (max_width / float(w)))), interpolation=cv2.INTER_AREA)
+        return Image.fromarray(cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGB))
+    return None
+
+def get_video_base64(video_path: str) -> str:
+    with open(video_path, "rb") as f:
+        return base64.b64encode(f.read()).decode("utf-8")
+
+video_catalog = load_all_video_catalogs(media_folder)
+
+if not video_catalog:
+    st.warning(f"No indexed videos found in `{media_folder}`. Ensure both .mp4 and matching .json exist.")
+    st.stop()
+
+st.subheader("🔍 Search Video Repository")
+search_query = st.text_input("Search by person, action, clothing, or scene keyword:", value="").strip()
+
+processed_videos = []
+norm_query = normalize_text(search_query) if search_query else ""
+query_tokens = [t for t in norm_query.split() if t not in STOPWORDS] or norm_query.split()
+
+for video_item in video_catalog:
+    v_name = video_item["video_name"]
+    frames = video_item["data"].get("frames", [])
+    matching_indices = []
+
+    if search_query:
+        for f_idx, fr in enumerate(frames):
+            text_parts = [v_name, fr.get("scene_summary", ""), fr.get("environment_or_place", "")]
+            for ent in fr.get("entities", []):
+                text_parts.extend([ent.get("label", ""), ent.get("name_or_identity", ""), ent.get("clothing_description", ""), ent.get("action", "")])
+            frame_corpus = normalize_text(" ".join(filter(None, text_parts)))
+            score = sum(1 for token in query_tokens if any(syn in frame_corpus for syn in get_synonyms(token)))
+            if score > 0:
+                matching_indices.append(f_idx)
+
+        if matching_indices:
+            processed_videos.append({"video_name": v_name, "video_path": video_item["video_path"], "matching_indices": matching_indices, "first_match_idx": matching_indices[0], "video_data": video_item["data"]})
+    else:
+        default_idx = min(max(1, len(frames) // 3), max(0, len(frames) - 1))
+        processed_videos.append({"video_name": v_name, "video_path": video_item["video_path"], "matching_indices": [], "first_match_idx": default_idx, "video_data": video_item["data"]})
+
+if "active_video_name" not in st.session_state or st.session_state["active_video_name"] not in [v["video_name"] for v in processed_videos]:
+    st.session_state["active_video_name"] = processed_videos[0]["video_name"] if processed_videos else None
+    st.session_state["active_initial_sec"] = processed_videos[0]["first_match_idx"] if processed_videos else 0
+
+st.markdown(f"### 🎞️ Video Gallery ({len(processed_videos)})")
+if not processed_videos:
+    st.info("No videos matched the query.")
+else:
+    cols = st.columns(3)
+    for idx, item in enumerate(processed_videos):
+        v_name = item["video_name"]
+        frames = item["video_data"].get("frames", [])
+        preview_sec = frames[item["first_match_idx"]].get("timestamp_seconds", 1.0) if frames else 0.0
+        is_selected = (v_name == st.session_state.get("active_video_name"))
+
+        with cols[idx % 3]:
+            with st.container(border=True):
+                thumb = extract_video_frame(item["video_path"], preview_sec, max_width=400)
+                if thumb:
+                    st.image(thumb, use_container_width=True)
+                st.markdown(f"**🎥 {v_name}**")
+                if item["matching_indices"]:
+                    st.caption(f"🎯 **{len(item['matching_indices'])} matching scene(s)**")
+                if st.button("✅ Selected" if is_selected else "▶️ Play in Player", key=f"sel_{idx}_{v_name}", disabled=is_selected):
+                    st.session_state["active_video_name"] = v_name
+                    st.session_state["active_initial_sec"] = item["first_match_idx"]
+                    st.rerun()
+
+st.divider()
+
+active_entry = next((v for v in processed_videos if v["video_name"] == st.session_state.get("active_video_name")), None)
+if active_entry:
+    st.subheader(f"🎬 Now Playing: {active_entry['video_name']}")
+    video_b64 = get_video_base64(active_entry["video_path"])
+    frames_json = json.dumps(active_entry["video_data"].get("frames", []))
+    matching_json = json.dumps(active_entry["matching_indices"])
+
+    player_html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <style>
+            * {{ box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }}
+            body {{ background: #0e1117; color: #fff; display: flex; justify-content: center; padding: 10px; }}
+            .player-wrapper {{ width: 100%; max-width: 960px; background: #000; border-radius: 10px; border: 1px solid #30363d; overflow: hidden; display: flex; flex-direction: column; }}
+            .video-stage {{ position: relative; width: 100%; height: 480px; background: #000; display: flex; align-items: center; justify-content: center; }}
+            video {{ width: 100%; height: 100%; object-fit: contain; }}
+            canvas {{ position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }}
+            .controls-panel {{ background: #161b22; padding: 12px 18px; display: flex; flex-direction: column; gap: 10px; border-top: 1px solid #30363d; }}
+            .scrubber-container {{ position: relative; width: 100%; height: 14px; cursor: pointer; display: flex; align-items: center; }}
+            .track-bg {{ position: absolute; width: 100%; height: 6px; background: #30363d; border-radius: 3px; overflow: hidden; }}
+            .highlight-segment {{ position: absolute; top: 0; height: 100%; background: #00FF7F; box-shadow: 0 0 8px #00FF7F; opacity: 0.95; }}
+            .track-progress {{ position: absolute; top: 0; left: 0; height: 100%; background: #e50914; width: 0%; pointer-events: none; }}
+            .scrubber-thumb {{ position: absolute; width: 14px; height: 14px; background: #fff; border-radius: 50%; transform: translateX(-50%); pointer-events: none; }}
+            .controls-bar {{ display: flex; align-items: center; justify-content: space-between; }}
+            .left-actions {{ display: flex; align-items: center; gap: 10px; }}
+            .ctrl-btn {{ background: #21262d; border: 1px solid #30363d; color: white; padding: 7px 14px; border-radius: 6px; cursor: pointer; }}
+            .play-btn {{ background: #238636; }}
+            .scene-indicator {{ background: #21262d; padding: 6px 12px; border-radius: 6px; font-size: 12px; max-width: 500px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }}
+        </style>
+    </head>
+    <body>
+        <div class="player-wrapper">
+            <div class="video-stage">
+                <video id="mainVid" src="data:video/mp4;base64,{video_b64}" preload="auto"></video>
+                <canvas id="overlayCanv"></canvas>
+            </div>
+            <div class="controls-panel">
+                <div class="scrubber-container" id="scrubber">
+                    <div class="track-bg" id="trackBg"><div class="track-progress" id="progress"></div></div>
+                    <div class="scrubber-thumb" id="thumb"></div>
+                </div>
+                <div class="controls-bar">
+                    <div class="left-actions">
+                        <button class="ctrl-btn play-btn" id="playBtn">▶ Play</button>
+                        <span id="timeText" style="font-family: monospace; color: #8b949e;">00:00 / 00:00</span>
+                    </div>
+                    <div class="scene-indicator" id="sceneBadge">Ready...</div>
+                </div>
+            </div>
+        </div>
+        <script>
+            (function() {{
+                const video = document.getElementById("mainVid"), canvas = document.getElementById("overlayCanv"), ctx = canvas.getContext("2d");
+                const playBtn = document.getElementById("playBtn"), scrubber = document.getElementById("scrubber"), trackBg = document.getElementById("trackBg");
+                const progress = document.getElementById("progress"), thumb = document.getElementById("thumb"), timeText = document.getElementById("timeText"), sceneBadge = document.getElementById("sceneBadge");
+                const framesData = {frames_json}, matchingSecs = new Set({matching_json});
+                const showBoxes = {'true' if show_boxes else 'false'}, showLabels = {'true' if show_labels else 'false'}, showAttire = {'true' if show_attire else 'false'}, boxColor = "{box_color}";
+
+                function formatTime(s) {{ const m = Math.floor(s/60), sec = Math.floor(s%60); return (m<10?'0':'')+m+':'+(sec<10?'0':'')+sec; }}
+                function resizeCanvas() {{ canvas.width = video.clientWidth; canvas.height = video.clientHeight; }}
+
+                function getBounds() {{
+                    const vW = video.videoWidth||1, vH = video.videoHeight||1, cW = video.clientWidth, cH = video.clientHeight;
+                    const vR = vW/vH, cR = cW/cH;
+                    return vR > cR ? {{ w: cW, h: cW/vR, x: 0, y: (cH - (cW/vR))/2 }} : {{ w: cH*vR, h: cH, x: (cW - (cH*vR))/2, y: 0 }};
+                }}
+
+                video.addEventListener('loadedmetadata', () => {{
+                    resizeCanvas();
+                    const dur = video.duration || 1;
+                    matchingSecs.forEach(sec => {{
+                        const seg = document.createElement("div"); seg.className = "highlight-segment";
+                        seg.style.left = (sec / dur * 100) + "%"; seg.style.width = Math.max(1.2, 1/dur * 100) + "%";
+                        trackBg.appendChild(seg);
+                    }});
+                    if ({active_entry['first_match_idx']} > 0) video.currentTime = {active_entry['first_match_idx']};
+                }});
+
+                window.addEventListener('resize', resizeCanvas);
+                playBtn.addEventListener('click', () => {{ video.paused ? (video.play(), playBtn.innerText="⏸ Pause") : (video.pause(), playBtn.innerText="▶ Play"); }});
+                scrubber.addEventListener('click', (e) => {{ const rect = scrubber.getBoundingClientRect(); video.currentTime = ((e.clientX - rect.left)/rect.width) * video.duration; }});
+
+                video.addEventListener('timeupdate', () => {{
+                    const cur = video.currentTime, dur = video.duration || 1, pct = (cur/dur)*100;
+                    progress.style.width = pct + "%"; thumb.style.left = pct + "%";
+                    timeText.innerText = formatTime(cur) + " / " + formatTime(dur);
+                    const curSec = Math.floor(cur);
+                    let matched = framesData.find(f => Math.floor(f.timestamp_seconds) === curSec) || framesData[Math.min(curSec, framesData.length - 1)];
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    if (matched) {{
+                        sceneBadge.innerText = matched.scene_summary || "Scene at " + formatTime(cur);
+                        if (showBoxes && matched.entities) {{
+                            const b = getBounds();
+                            matched.entities.forEach(ent => {{
+                                if (ent.box_2d) {{
+                                    const ymin = b.y + (ent.box_2d.ymin/1000)*b.h, xmin = b.x + (ent.box_2d.xmin/1000)*b.w;
+                                    const ymax = b.y + (ent.box_2d.ymax/1000)*b.h, xmax = b.x + (ent.box_2d.xmax/1000)*b.w;
+                                    ctx.strokeStyle = boxColor; ctx.lineWidth = 3; ctx.strokeRect(xmin, ymin, xmax - xmin, ymax - ymin);
+                                    let tag = (showLabels ? (ent.name_or_identity || ent.label || "") : "") + (showAttire && ent.clothing_description ? " ["+ent.clothing_description+"]" : "");
+                                    if (tag.trim()) {{
+                                        ctx.fillStyle = "rgba(0,0,0,0.85)"; ctx.fillRect(xmin, Math.max(b.y, ymin - 18), ctx.measureText(tag).width + 8, 16);
+                                        ctx.fillStyle = boxColor; ctx.font = "bold 12px sans-serif"; ctx.fillText(tag, xmin + 4, Math.max(b.y, ymin - 18) + 12);
+                                    }}
+                                }}
+                            }});
+                        }}
+                    }}
+                }});
+            }})();
+        </script>
+    </body>
+    </html>
+    """
+    components.html(player_html, height=660)</code></pre>
+            </div>
+        </section>
+
+        <!-- Section 5: Local Execution -->
+        <section id="local-run">
+            <h2>5. Running Locally (Windows & Mac)</h2>
+
+            <h3>Step 1: Create and Activate Virtual Environment</h3>
+            <p><strong>On Windows (PowerShell):</strong></p>
+            <div class="code-container">
+                <div class="code-header"><span>PowerShell</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+                <pre><code>python -m venv .venv
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+.\.venv\Scripts\Activate.ps1</code></pre>
+            </div>
+
+            <p><strong>On macOS / Linux (Terminal):</strong></p>
+            <div class="code-container">
+                <div class="code-header"><span>Bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+                <pre><code>python3 -m venv .venv
+source .venv/bin/activate</code></pre>
+            </div>
+
+            <h3>Step 2: Install Dependencies & Run</h3>
+            <div class="code-container">
+                <div class="code-header"><span>Terminal</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+                <pre><code>pip install google-genai pydantic opencv-python pillow streamlit python-dotenv
+
+# Process video to generate JSON
+python video_analytics.py media/sample_video.mp4
+
+# Run web app
+streamlit run app.py</code></pre>
+            </div>
+        </section>
+
+        <!-- Section 6: Colab Run -->
+        <section id="colab-run">
+            <h2>6. Running in Google Colab (Tested & Verified)</h2>
+            <p>Because third-party tunnels like Cloudflare can fail with <code>DNS_PROBE_FINISHED_NXDOMAIN</code> due to Indian ISP filtering, use **Google's Native Port Forwarding Proxy**:</p>
+
+            <div class="code-container">
+                <div class="code-header"><span>Colab Cell: Native Port Forwarding</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+                <pre><code>from google.colab.output import serve_kernel_port_as_window
+import subprocess
+import time
+
+# 1. Terminate existing instances
+!pkill -f streamlit
+
+# 2. Run Streamlit bound to all interfaces
+subprocess.Popen([
+    "streamlit", "run", "app.py",
+    "--server.port", "8501",
+    "--server.address", "0.0.0.0",
+    "--server.headless", "true",
+    "--server.enableCORS", "false",
+    "--server.enableXsrfProtection", "false"
+])
+
+print("Waiting for Streamlit to initialize...")
+time.sleep(4)
+
+# 3. Direct Google-hosted authenticated URL
+serve_kernel_port_as_window(8501)</code></pre>
+            </div>
+
+            <h3>Alternative: Public LocalTunnel Link</h3>
+            <div class="code-container">
+                <div class="code-header"><span>Colab Cell: LocalTunnel</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+                <pre><code>!pkill -f streamlit
+!streamlit run app.py --server.port 8501 --server.headless true &> /content/streamlit.log &
+
+# Print tunnel password (IP)
+import urllib.request
+ip = urllib.request.urlopen('https://ipv4.icanhazip.com').read().decode('utf8').strip()
+print(f"🔑 YOUR LOCALTUNNEL PASSWORD (IP): {ip}")
+
+# Open tunnel
+!npx localtunnel --port 8501</code></pre>
+            </div>
+        </section>
+
+        <!-- Section 7: Talk Script -->
+        <section id="demo-script">
+            <h2>7. 5-Minute GDG Presentation Script</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">Timeline</th>
+                        <th style="width: 35%;">Action</th>
+                        <th style="width: 45%;">Key Speaking Point</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>0:00 - 1:00</strong></td>
+                        <td>Show traditional vs multimodal slide</td>
+                        <td>"Stop cascading separate models for detection, OCR, and action recognition. Gemini processes video as a continuous temporal context."</td>
+                    </tr>
+                    <tr>
+                        <td><strong>1:00 - 2:00</strong></td>
+                        <td>Display <code>[ymin, xmin, ymax, xmax]</code> schema</td>
+                        <td>"By setting <code>response_schema</code> with Pydantic, the model outputs strictly typed 0-1000 coordinates without conversational fluff."</td>
+                    </tr>
+                    <tr>
+                        <td><strong>2:00 - 3:00</strong></td>
+                        <td>Show Terminal / Colab running</td>
+                        <td>"At 1 FPS, a 1-minute video costs ~17k tokens. The Files API uploads once, allowing repeated semantic querying."</td>
+                    </tr>
+                    <tr>
+                        <td><strong>3:00 - 5:00</strong></td>
+                        <td>Type <em>'dhoni in yellow jersey'</em> in search</td>
+                        <td>"Notice how the scrubber lights up in <strong>neon green</strong> right where the match occurs. Clicking the segment seeks instantly with synchronized live bounding boxes."</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <script>
+        function copyCode(button) {
+            const pre = button.parentElement.nextElementSibling;
+            const code = pre.querySelector('code').innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = button.innerText;
+                button.innerText = 'Copied!';
+                button.style.backgroundColor = 'var(--accent-green)';
+                setTimeout(() => {
+                    button.innerText = originalText;
+                    button.style.backgroundColor = 'var(--bg-card)';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
