@@ -299,6 +299,7 @@
                     <button class="copy-btn" onclick="copyCode(this)">Copy Code</button>
                 </div>
                 <pre><code>import os
+import time
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
@@ -324,7 +325,19 @@ class FrameAnalysis(BaseModel):
     entities: List[DetectedEntity]
 
 # Ingest and ground entities
-video_file = client.files.upload(file="media/sample.mp4")
+print("[*] Uploading video file...")
+video_file = client.files.upload(file="/content/media/john-cars.mp4")
+
+# Poll the file state until it is ACTIVE
+print("[*] Waiting for video processing to complete...")
+while video_file.state.name == "PROCESSING":
+    time.sleep(5)
+    video_file = client.files.get(name=video_file.name)
+
+if video_file.state.name == "FAILED":
+    raise RuntimeError(f"File processing failed: {video_file.error.message}")
+
+print("[*] File is ACTIVE. Running Gemini model content generation...")
 response = client.models.generate_content(
     model="gemini-2.5-flash",
     contents=[video_file, "Detect persons, actions, and normalized bounding boxes."],
