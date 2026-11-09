@@ -271,27 +271,27 @@
         <!-- Section 1: Overview -->
         <section id="overview">
             <h2>1. Architectural Concepts</h2>
-            <p>Traditional computer vision approaches require multi-stage pipelines: running YOLO for bounding boxes, OpenCV Haar/MTCNN for face tracking, separate action classifiers, and speech-to-text models. With multimodal Large Language Models like <strong>Gemini 2.5 Flash</strong>, video is ingested natively inside a unified spatial-temporal context window.</p>
+            <p>Traditional computer vision approaches require multi-stage pipelines: running YOLO for bounding boxes, OpenCV Haar/MTCNN for face tracking, separate action classifiers, and speech-to-text models. With multimodal Large Language Models like <strong>Gemini 2.5 Flash</strong>, video is ingested natively inside a unified spatial-temporal context window[cite: 1].</p>
 
             <div class="callout success">
                 <strong>Sampling & Token Optimization:</strong><br>
-                Videos uploaded through the Google GenAI Files API are automatically sampled visually at <strong>1 frame per second (1 FPS)</strong> (~258–263 tokens/second) with audio consumed at ~32 tokens/second. A 1-minute video costs only ~17,700 tokens, easily fitting inside Gemini's 1M+ context window.
+                Videos uploaded through the Google GenAI Files API are automatically sampled visually at <strong>1 frame per second (1 FPS)</strong> (~258–263 tokens/second) with audio consumed at ~32 tokens/second[cite: 1]. A 1-minute video costs only ~17,700 tokens, easily fitting inside Gemini's 1M+ context window[cite: 1].
             </div>
 
             <h3>Spatial Entity Grounding Format</h3>
-            <p>Gemini returns normalized 2D coordinates scaled between <code>0</code> and <code>1000</code>:</p>
-            <p><code>[ymin, xmin, ymax, xmax]</code> where top-left is <code>(0,0)</code> and bottom-right is <code>(1000, 1000)</code>.</p>
-            <p>To rescale coordinates to pixel boundaries on any video resolution:</p>
+            <p>Gemini returns normalized 2D coordinates scaled between <code>0</code> and <code>1000</code>[cite: 1]:</p>
+            <p><code>[ymin, xmin, ymax, xmax]</code> where top-left is <code>(0,0)</code> and bottom-right is <code>(1000, 1000)</code>[cite: 1].</p>
+            <p>To rescale coordinates to pixel boundaries on any video resolution[cite: 1]:</p>
             <ul>
-                <li><code>pixel_x = (xmin / 1000) * image_width</code></li>
-                <li><code>pixel_y = (ymin / 1000) * image_height</code></li>
+                <li><code>pixel_x = (xmin / 1000) * image_width</code>[cite: 1]</li>
+                <li><code>pixel_y = (ymin / 1000) * image_height</code>[cite: 1]</li>
             </ul>
         </section>
 
         <!-- Section 2: Quickstart -->
         <section id="quickstart">
             <h2>2. Quickstart & Minimal Spatial Grounding</h2>
-            <p>Before running full pipelines, verify spatial coordinate prediction on a single test video using this 30-line script:</p>
+            <p>Before running full pipelines, verify spatial coordinate prediction on a single test video using this 30-line script[cite: 1]:</p>
 
             <div class="code-container">
                 <div class="code-header">
@@ -353,7 +353,8 @@ print(response.text)</code></pre>
         <!-- Section 3: Backend -->
         <section id="backend">
             <h2>3. Backend Pipeline (video_analytics.py)</h2>
-            <p>This script processes any target video, enforces persistent entity tracking across frames (<code>person_1</code>, <code>face_1</code>), extracts attire color/style, crops face thumbnails with OpenCV, and generates an indexed JSON file alongside your video.</p>
+            <p>If you are running in the colab cell ensure you prefix first line of code with  "%%writefile video_analytics.py"</p>
+            <p>This script processes any target video, enforces persistent entity tracking across frames (<code>person_1</code>, <code>face_1</code>), extracts attire color/style, crops face thumbnails with OpenCV, and generates an indexed JSON file alongside your video[cite: 1].</p>
 
             <div class="code-container">
                 <div class="code-header">
@@ -494,7 +495,8 @@ if __name__ == "__main__":
         <!-- Section 4: Front-End -->
         <section id="frontend">
             <h2>4. Front-End Interface (app.py)</h2>
-            <p>The front-end integrates a compact 3-column video gallery, multi-word semantic fuzzy search, and an HTML5 player with a YouTube-style scrubber showing <strong>in-timeline glowing green match segments</strong> and live-updating canvas overlays.</p>
+            <p>If you are running in the colab cell ensure that  you prefix the first line of the code with  "%%writefile app.py"</p>
+            <p>The front-end integrates a compact 3-column video gallery, multi-word semantic fuzzy search, and an HTML5 player with a YouTube-style scrubber showing <strong>in-timeline glowing green match segments</strong> and live-updating canvas overlays[cite: 1].</p>
 
             <div class="code-container">
                 <div class="code-header">
@@ -651,11 +653,11 @@ if active_entry:
     matching_json = json.dumps(active_entry["matching_indices"])
 
     player_html = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="utf-8">
-        <style>
+    &lt;!DOCTYPE html&gt;
+    &lt;html&gt;
+    &lt;head&gt;
+        &lt;meta charset="utf-8"&gt;
+        &lt;style&gt;
             * {{ box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }}
             body {{ background: #0e1117; color: #fff; display: flex; justify-content: center; padding: 10px; }}
             .player-wrapper {{ width: 100%; max-width: 960px; background: #000; border-radius: 10px; border: 1px solid #30363d; overflow: hidden; display: flex; flex-direction: column; }}
@@ -673,29 +675,29 @@ if active_entry:
             .ctrl-btn {{ background: #21262d; border: 1px solid #30363d; color: white; padding: 7px 14px; border-radius: 6px; cursor: pointer; }}
             .play-btn {{ background: #238636; }}
             .scene-indicator {{ background: #21262d; padding: 6px 12px; border-radius: 6px; font-size: 12px; max-width: 500px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }}
-        </style>
-    </head>
-    <body>
-        <div class="player-wrapper">
-            <div class="video-stage">
-                <video id="mainVid" src="data:video/mp4;base64,{video_b64}" preload="auto"></video>
-                <canvas id="overlayCanv"></canvas>
-            </div>
-            <div class="controls-panel">
-                <div class="scrubber-container" id="scrubber">
-                    <div class="track-bg" id="trackBg"><div class="track-progress" id="progress"></div></div>
-                    <div class="scrubber-thumb" id="thumb"></div>
-                </div>
-                <div class="controls-bar">
-                    <div class="left-actions">
-                        <button class="ctrl-btn play-btn" id="playBtn">▶ Play</button>
-                        <span id="timeText" style="font-family: monospace; color: #8b949e;">00:00 / 00:00</span>
-                    </div>
-                    <div class="scene-indicator" id="sceneBadge">Ready...</div>
-                </div>
-            </div>
-        </div>
-        <script>
+        &lt;/style&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div class="player-wrapper"&gt;
+            &lt;div class="video-stage"&gt;
+                &lt;video id="mainVid" src="data:video/mp4;base64,{video_b64}" preload="auto"&gt;&lt;/video&gt;
+                &lt;canvas id="overlayCanv"&gt;&lt;/canvas&gt;
+            &lt;/div&gt;
+            &lt;div class="controls-panel"&gt;
+                &lt;div class="scrubber-container" id="scrubber"&gt;
+                    &lt;div class="track-bg" id="trackBg"&gt;&lt;div class="track-progress" id="progress"&gt;&lt;/div&gt;&lt;/div&gt;
+                    &lt;div class="scrubber-thumb" id="thumb"&gt;&lt;/div&gt;
+                &lt;/div&gt;
+                &lt;div class="controls-bar"&gt;
+                    &lt;div class="left-actions"&gt;
+                        &lt;button class="ctrl-btn play-btn" id="playBtn"&gt;▶ Play&lt;/button&gt;
+                        &lt;span id="timeText" style="font-family: monospace; color: #8b949e;"&gt;00:00 / 00:00&lt;/span&gt;
+                    &lt;/div&gt;
+                    &lt;div class="scene-indicator" id="sceneBadge"&gt;Ready...&lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;script&gt;
             (function() {{
                 const video = document.getElementById("mainVid"), canvas = document.getElementById("overlayCanv"), ctx = canvas.getContext("2d");
                 const playBtn = document.getElementById("playBtn"), scrubber = document.getElementById("scrubber"), trackBg = document.getElementById("trackBg");
@@ -703,47 +705,47 @@ if active_entry:
                 const framesData = {frames_json}, matchingSecs = new Set({matching_json});
                 const showBoxes = {'true' if show_boxes else 'false'}, showLabels = {'true' if show_labels else 'false'}, showAttire = {'true' if show_attire else 'false'}, boxColor = "{box_color}";
 
-                function formatTime(s) {{ const m = Math.floor(s/60), sec = Math.floor(s%60); return (m<10?'0':'')+m+':'+(sec<10?'0':'')+sec; }}
+                function formatTime(s) {{ const m = Math.floor(s/60), sec = Math.floor(s%60); return (m&lt;10?'0':'')+m+':'+(sec&lt;10?'0':'')+sec; }}
                 function resizeCanvas() {{ canvas.width = video.clientWidth; canvas.height = video.clientHeight; }}
 
                 function getBounds() {{
                     const vW = video.videoWidth||1, vH = video.videoHeight||1, cW = video.clientWidth, cH = video.clientHeight;
                     const vR = vW/vH, cR = cW/cH;
-                    return vR > cR ? {{ w: cW, h: cW/vR, x: 0, y: (cH - (cW/vR))/2 }} : {{ w: cH*vR, h: cH, x: (cW - (cH*vR))/2, y: 0 }};
+                    return vR &gt; cR ? {{ w: cW, h: cW/vR, x: 0, y: (cH - (cW/vR))/2 }} : {{ w: cH*vR, h: cH, x: (cW - (cH*vR))/2, y: 0 }};
                 }}
 
-                video.addEventListener('loadedmetadata', () => {{
+                video.addEventListener('loadedmetadata', () =&gt; {{
                     resizeCanvas();
                     const dur = video.duration || 1;
-                    matchingSecs.forEach(sec => {{
+                    matchingSecs.forEach(sec =&gt; {{
                         const seg = document.createElement("div"); seg.className = "highlight-segment";
                         seg.style.left = (sec / dur * 100) + "%"; seg.style.width = Math.max(1.2, 1/dur * 100) + "%";
                         trackBg.appendChild(seg);
                     }});
-                    if ({active_entry['first_match_idx']} > 0) video.currentTime = {active_entry['first_match_idx']};
+                    if ({active_entry['first_match_idx']} &gt; 0) video.currentTime = {active_entry['first_match_idx']};
                 }});
 
                 window.addEventListener('resize', resizeCanvas);
-                playBtn.addEventListener('click', () => {{ video.paused ? (video.play(), playBtn.innerText="⏸ Pause") : (video.pause(), playBtn.innerText="▶ Play"); }});
-                scrubber.addEventListener('click', (e) => {{ const rect = scrubber.getBoundingClientRect(); video.currentTime = ((e.clientX - rect.left)/rect.width) * video.duration; }});
+                playBtn.addEventListener('click', () =&gt; {{ video.paused ? (video.play(), playBtn.innerText="⏸ Pause") : (video.pause(), playBtn.innerText="▶ Play"); }});
+                scrubber.addEventListener('click', (e) =&gt; {{ const rect = scrubber.getBoundingClientRect(); video.currentTime = ((e.clientX - rect.left)/rect.width) * video.duration; }});
 
-                video.addEventListener('timeupdate', () => {{
+                video.addEventListener('timeupdate', () =&gt; {{
                     const cur = video.currentTime, dur = video.duration || 1, pct = (cur/dur)*100;
                     progress.style.width = pct + "%"; thumb.style.left = pct + "%";
                     timeText.innerText = formatTime(cur) + " / " + formatTime(dur);
                     const curSec = Math.floor(cur);
-                    let matched = framesData.find(f => Math.floor(f.timestamp_seconds) === curSec) || framesData[Math.min(curSec, framesData.length - 1)];
+                    let matched = framesData.find(f =&gt; Math.floor(f.timestamp_seconds) === curSec) || framesData[Math.min(curSec, framesData.length - 1)];
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
                     if (matched) {{
                         sceneBadge.innerText = matched.scene_summary || "Scene at " + formatTime(cur);
-                        if (showBoxes && matched.entities) {{
+                        if (showBoxes &amp;&amp; matched.entities) {{
                             const b = getBounds();
-                            matched.entities.forEach(ent => {{
+                            matched.entities.forEach(ent =&gt; {{
                                 if (ent.box_2d) {{
                                     const ymin = b.y + (ent.box_2d.ymin/1000)*b.h, xmin = b.x + (ent.box_2d.xmin/1000)*b.w;
                                     const ymax = b.y + (ent.box_2d.ymax/1000)*b.h, xmax = b.x + (ent.box_2d.xmax/1000)*b.w;
                                     ctx.strokeStyle = boxColor; ctx.lineWidth = 3; ctx.strokeRect(xmin, ymin, xmax - xmin, ymax - ymin);
-                                    let tag = (showLabels ? (ent.name_or_identity || ent.label || "") : "") + (showAttire && ent.clothing_description ? " ["+ent.clothing_description+"]" : "");
+                                    let tag = (showLabels ? (ent.name_or_identity || ent.label || "") : "") + (showAttire &amp;&amp; ent.clothing_description ? " ["+ent.clothing_description+"]" : "");
                                     if (tag.trim()) {{
                                         ctx.fillStyle = "rgba(0,0,0,0.85)"; ctx.fillRect(xmin, Math.max(b.y, ymin - 18), ctx.measureText(tag).width + 8, 16);
                                         ctx.fillStyle = boxColor; ctx.font = "bold 12px sans-serif"; ctx.fillText(tag, xmin + 4, Math.max(b.y, ymin - 18) + 12);
@@ -754,9 +756,9 @@ if active_entry:
                     }}
                 }});
             }})();
-        </script>
-    </body>
-    </html>
+        &lt;/script&gt;
+    &lt;/body&gt;
+    &lt;/html&gt;
     """
     components.html(player_html, height=660)</code></pre>
             </div>
@@ -797,23 +799,58 @@ streamlit run app.py</code></pre>
 
         <!-- Section 6: Colab Run -->
         <section id="colab-run">
-            <h2>6. Running in Google Colab (Tested & Verified)</h2>
-            <h2> Important: Please Ensure you set your Gemini API Key Colab</h2>
+            <h2>6. Running in Google Colab (Step-by-Step)</h2>
 
+            <!-- Step 1: API Key & Dependencies -->
+            <h3>Step 1: Set Gemini API Key in Colab Secrets</h3>
+            <p>
+                In the Google Colab left sidebar, open the <strong>Secrets (🔑)</strong> tab, add a new secret named <code>GEMINI_API_KEY</code>, paste your API key, and toggle on <em>"Notebook access"</em>. Then run this cell to install dependencies and initialize your key:
+            </p>
             <div class="code-container">
-                <div class="code-header"><span>Colab Cell: Initialize Gemini API Key</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-                <pre><code>import os
+                <div class="code-header"><span>Colab Cell: Install & Authenticate</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+                <pre><code># 1. Install dependencies
+!pip install -q google-genai pydantic opencv-python pillow streamlit python-dotenv
+
+# 2. Load API key securely from Colab Secrets
+import os
 from google.colab import userdata
 
 os.environ["GEMINI_API_KEY"] = userdata.get("GEMINI_API_KEY")
-print("API Key loaded successfully!") </code></pre>
+print("✓ GEMINI_API_KEY loaded successfully!")</code></pre>
             </div>
-                    
-            
-            <p>Because third-party tunnels like Cloudflare can fail with <code>DNS_PROBE_FINISHED_NXDOMAIN</code> due to Indian ISP filtering, use **Google's Native Port Forwarding Proxy**:</p>
+
+            <!-- Step 2: Download Sample Videos -->
+            <h3>Step 2: Download Sample Videos</h3>
+            <p>
+                Download the workshop test videos directly from Google Drive:
+                <br>
+                📂 <a href="https://drive.google.com/drive/folders/1hsHVf1QpQz3PCC_2iraHQiSW_pLNGSJn?usp=sharing" target="_blank" style="color: var(--accent-neon); font-weight: 600; text-decoration: underline;">
+                    Download Sample Videos (Google Drive Folder)
+                </a>
+            </p>
+            <div class="callout">
+                <strong>Colab File Placement:</strong> Create a folder named <code>media</code> in your Colab file explorer and upload your selected video file (for example, <code>media/john-cars.mp4</code> or any custom clip).
+            </div>
+
+            <!-- Step 3: Run Video Analytics -->
+            <h3>Step 3: Run Video Analytics on Video of Choice</h3>
+            <p>Run <code>video_analytics.py</code> passing the path to the video you want to analyze. This ingests the video to Gemini via Files API, tracks persistent entities, crops face thumbnails with OpenCV, and outputs a matching <code>.json</code> file[cite: 1]:</p>
+            <div class="code-container">
+                <div class="code-header"><span>Colab Cell: Run Analytics</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+                <pre><code># Replace 'media/john-cars.mp4' with the path to the video of your choice
+!python video_analytics.py media/john-cars.mp4
+
+# Verify that the indexed JSON report  exist in media folder
+!ls -lh media/
+</code></pre>
+            </div>
+
+            <!-- Step 4: Streamlit App -->
+            <h3>Step 4: Launch Streamlit Studio in Colab</h3>
+            <p>Because third-party tunnels like Cloudflare can fail with <code>DNS_PROBE_FINISHED_NXDOMAIN</code> due to Indian ISP filtering, use <strong>Google's Native Port Forwarding Proxy</strong>[cite: 1]:</p>
 
             <div class="code-container">
-                <div class="code-header"><span>Colab Cell: Native Port Forwarding</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+                <div class="code-header"><span>Colab Cell: Native Port Forwarding (Recommended)</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
                 <pre><code>from google.colab.output import serve_kernel_port_as_window
 import subprocess
 import time
@@ -869,22 +906,22 @@ print(f"🔑 YOUR LOCALTUNNEL PASSWORD (IP): {ip}")
                     <tr>
                         <td><strong>0:00 - 1:00</strong></td>
                         <td>Show traditional vs multimodal slide</td>
-                        <td>"Stop cascading separate models for detection, OCR, and action recognition. Gemini processes video as a continuous temporal context."</td>
+                        <td>"Stop cascading separate models for detection, OCR, and action recognition. Gemini processes video as a continuous temporal context."[cite: 1]</td>
                     </tr>
                     <tr>
                         <td><strong>1:00 - 2:00</strong></td>
                         <td>Display <code>[ymin, xmin, ymax, xmax]</code> schema</td>
-                        <td>"By setting <code>response_schema</code> with Pydantic, the model outputs strictly typed 0-1000 coordinates without conversational fluff."</td>
+                        <td>"By setting <code>response_schema</code> with Pydantic, the model outputs strictly typed 0-1000 coordinates without conversational fluff."[cite: 1]</td>
                     </tr>
                     <tr>
                         <td><strong>2:00 - 3:00</strong></td>
                         <td>Show Terminal / Colab running</td>
-                        <td>"At 1 FPS, a 1-minute video costs ~17k tokens. The Files API uploads once, allowing repeated semantic querying."</td>
+                        <td>"At 1 FPS, a 1-minute video costs ~17k tokens. The Files API uploads once, allowing repeated semantic querying."[cite: 1]</td>
                     </tr>
                     <tr>
                         <td><strong>3:00 - 5:00</strong></td>
                         <td>Type <em>'dhoni in yellow jersey'</em> in search</td>
-                        <td>"Notice how the scrubber lights up in <strong>neon green</strong> right where the match occurs. Clicking the segment seeks instantly with synchronized live bounding boxes."</td>
+                        <td>"Notice how the scrubber lights up in <strong>neon green</strong> right where the match occurs. Clicking the segment seeks instantly with synchronized live bounding boxes."[cite: 1]</td>
                     </tr>
                 </tbody>
             </table>
