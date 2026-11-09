@@ -798,6 +798,18 @@ streamlit run app.py</code></pre>
         <!-- Section 6: Colab Run -->
         <section id="colab-run">
             <h2>6. Running in Google Colab (Tested & Verified)</h2>
+            <h2> Important: Please Ensure you set your Gemini API Key Colab</h2>
+
+            <div class="code-container">
+                <div class="code-header"><span>Colab Cell: Initialize Gemini API Key</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+                <pre><code>import os
+from google.colab import userdata
+
+os.environ["GEMINI_API_KEY"] = userdata.get("GEMINI_API_KEY")
+print("API Key loaded successfully!") </code></pre>
+            </div>
+                    
+            
             <p>Because third-party tunnels like Cloudflare can fail with <code>DNS_PROBE_FINISHED_NXDOMAIN</code> due to Indian ISP filtering, use **Google's Native Port Forwarding Proxy**:</p>
 
             <div class="code-container">
